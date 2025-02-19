@@ -1,0 +1,316 @@
+@charset "utf-8";
+@import url('https://fastly.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css');
+
+:root {
+    --primary: #ff0080;
+    --secondary: #00ff00;
+    --accent: #00ffff;
+    --text-light: #33ff33;
+    --bg-dark: #000000;
+    --scanline-color: rgba(255, 255, 255, 0.1);
+    --neon-glow: 0 0 7px #fff,
+                0 0 10px #fff,
+                0 0 21px #fff,
+                0 0 42px var(--primary),
+                0 0 82px var(--primary),
+                0 0 92px var(--primary);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* CRT Screen Effect */
+body::before {
+    content: "";
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%,
+        rgba(0, 0, 0, 0.25) 50%
+    );
+    background-size: 100% 4px;
+    z-index: 1000;
+    pointer-events: none;
+    animation: flicker 0.15s infinite;
+    opacity: 0.3;
+}
+
+body {
+    font-family: Galmuri9;
+    line-height: 1.6;
+    color: var(--text-light);
+    background: var(--bg-dark);
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Scanline Animation */
+@keyframes scanline {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(100%);
+    }
+}
+
+.scanline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        var(--scanline-color) 50%,
+        transparent 100%
+    );
+    animation: scanline 8s linear infinite;
+    pointer-events: none;
+    z-index: 999;
+}
+
+/* Loading Screen */
+.loading-screen {
+    background: var(--bg-dark);
+    color: var(--primary);
+    text-shadow: var(--neon-glow);
+    animation: blink 1s steps(2, start) infinite;
+}
+
+.loader {
+    font-size: 1.5rem;
+    animation: none;
+}
+
+/* Navigation */
+.navbar {
+    background: var(--bg-dark);
+    border-bottom: 2px solid var(--primary);
+}
+
+.logo {
+    color: var(--primary);
+    text-shadow: var(--neon-glow);
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+.nav-links li a {
+    color: var(--text-light);
+    font-size: 0.8rem;
+    text-decoration: none;
+    position: relative;
+    padding-left: 1.2em;
+}
+
+.nav-links li a::before {
+    content: "►";
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+}
+
+.nav-links li a:hover {
+    color: var(--primary);
+    text-shadow: var(--neon-glow);
+}
+
+/* Hero Section */
+.hero {
+    background: var(--bg-dark);
+    position: relative;
+    overflow: hidden;
+    border-bottom: 2px solid var(--primary);
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+}
+
+.glitch {
+    color: var(--primary);
+    text-shadow: var(--neon-glow);
+    position: relative;
+    animation: textflicker 3s infinite;
+}
+
+/* Pixel Border */
+.pixel-border {
+    position: relative;
+    border: 4px solid var(--primary);
+    background: var(--bg-dark);
+    box-shadow: 0 0 10px var(--primary);
+}
+
+.pixel-border::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    background: linear-gradient(45deg, var(--primary) 25%, transparent 25%) -5px 0,
+                linear-gradient(-45deg, var(--primary) 25%, transparent 25%) -5px 0;
+    background-size: 8px 8px;
+    z-index: -1;
+}
+
+/* About Section Cards */
+.personality-card {
+    background: var(--bg-dark);
+    border: 2px solid var(--primary);
+    box-shadow: inset 0 0 10px var(--primary);
+    transition: all 0.3s ease;
+}
+
+.personality-card:hover {
+    transform: translateY(-5px);
+    box-shadow: inset 0 0 20px var(--primary),
+                0 0 20px var(--primary);
+}
+
+.personality-card i {
+    color: var(--primary);
+    text-shadow: var(--neon-glow);
+}
+
+/* Skills Section */
+.skill-category {
+    background: var(--bg-dark);
+    border: 2px solid var(--primary);
+    box-shadow: inset 0 0 10px var(--primary);
+}
+
+.skill-list li {
+    position: relative;
+    padding-left: 1.5em;
+}
+
+.skill-list li::before {
+    content: "►";
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+}
+
+/* Projects Section */
+.project-card {
+    border: 2px solid var(--primary);
+    background: var(--bg-dark);
+    position: relative;
+    overflow: hidden;
+}
+
+.project-overlay {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.project-link {
+    background: var(--primary);
+    color: var(--bg-dark);
+    border: none;
+    padding: 0.5rem 1rem;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.project-link::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    animation: shine 3s infinite;
+}
+
+/* Animations */
+@keyframes textflicker {
+    0% { text-shadow: var(--neon-glow); }
+    2% { text-shadow: none; }
+    8% { text-shadow: var(--neon-glow); }
+    9% { text-shadow: none; }
+    12% { text-shadow: var(--neon-glow); }
+    20% { text-shadow: none; }
+    25% { text-shadow: var(--neon-glow); }
+}
+
+@keyframes flicker {
+    0% { opacity: 0.27861; }
+    5% { opacity: 0.34769; }
+    10% { opacity: 0.23604; }
+    15% { opacity: 0.90626; }
+    20% { opacity: 0.18128; }
+    25% { opacity: 0.83891; }
+    30% { opacity: 0.65583; }
+    35% { opacity: 0.67807; }
+    40% { opacity: 0.26559; }
+    45% { opacity: 0.84693; }
+    50% { opacity: 0.96019; }
+    55% { opacity: 0.08594; }
+    60% { opacity: 0.20313; }
+    65% { opacity: 0.71988; }
+    70% { opacity: 0.53455; }
+    75% { opacity: 0.37288; }
+    80% { opacity: 0.71428; }
+    85% { opacity: 0.70419; }
+    90% { opacity: 0.7003; }
+    95% { opacity: 0.36108; }
+    100% { opacity: 0.24387; }
+}
+
+@keyframes shine {
+    to {
+        left: 100%;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-links {
+        background: var(--bg-dark);
+        border: 2px solid var(--primary);
+    }
+    
+    .hamburger span {
+        background: var(--primary);
+    }
+}
+
+/* Print styles */
+@media print {
+    body::before,
+    .scanline {
+        display: none;
+    }
+}

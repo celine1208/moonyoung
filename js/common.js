@@ -183,144 +183,133 @@ projectCards.forEach(card => {
     });
 });
 
-class Particle {
-    constructor(canvas, ctx, color) {
-        this.canvas = canvas;
-        this.ctx = ctx;
-        this.color = color;
-        this.init();
-    }
+// 히어로 섹션에 캔버스 추가
+const hero = document.querySelector('.hero');
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
 
-    init() {
-        // 파티클의 초기 위치 설정
-        this.x = Math.random() * this.canvas.width;
-        this.y = Math.random() * this.canvas.height;
-        
-        // 파티클의 크기 설정 (2-4px)
-        this.size = Math.random() * 2 + 2;
-        
-        // 파티클의 이동 속도와 방향 설정
-        this.speedX = Math.random() * 2 - 1;
-        this.speedY = Math.random() * 2 - 1;
-        
-        // 파티클의 투명도 설정
-        this.alpha = Math.random() * 0.5 + 0.5;
-    }
+// 캔버스 스타일 설정
+canvas.style.position = 'absolute';
+canvas.style.top = '0';
+canvas.style.left = '0';
+canvas.style.width = '100%';
+canvas.style.height = '100%';
+canvas.style.opacity = '0.4'; // 투명도 증가
+canvas.style.pointerEvents = 'none';
+canvas.style.mixBlendMode = 'screen'; // 블렌드 모드 추가
 
-    // 파티클 위치 업데이트
-    update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
+// 히어로 섹션에 캔버스 추가
+hero.style.position = 'relative';
+hero.style.overflow = 'hidden';
+hero.insertBefore(canvas, hero.firstChild);
 
-        // 화면 경계 처리
-        if (this.x > this.canvas.width || this.x < 0) {
-            this.speedX = -this.speedX;
-        }
-        if (this.y > this.canvas.height || this.y < 0) {
-            this.speedY = -this.speedY;
-        }
-    }
-
-    // 파티클 그리기
-    draw() {
-        this.ctx.beginPath();
-        this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        this.ctx.fillStyle = `rgba(${this.color}, ${this.alpha})`;
-        this.ctx.fill();
-    }
+// 캔버스 크기 설정 함수
+function resizeCanvas() {
+    canvas.width = hero.offsetWidth;
+    canvas.height = hero.offsetHeight;
 }
 
-class ParticleAnimation {
+// 초기 크기 설정 및 리사이즈 이벤트 리스너 추가
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// 글리치 효과 설정
+class GlitchEffect {
     constructor() {
-        this.canvas = document.createElement('canvas');
-        this.ctx = this.canvas.getContext('2d');
-        this.particles = [];
-        this.numberOfParticles = 50;
-        this.init();
+        this.glitchLines = [];
+        this.lastUpdate = 0;
+        this.updateInterval = 40; // 업데이트 간격 감소
+        this.maxLines = 15; // 최대 라인 수 설정
     }
 
-    init() {
-        // hero 섹션에 캔버스 추가
-        const heroSection = document.querySelector('.hero');
-        if (!heroSection) return;
-
-        this.canvas.style.position = 'absolute';
-        this.canvas.style.top = '0';
-        this.canvas.style.left = '0';
-        this.canvas.style.width = '100%';
-        this.canvas.style.height = '100%';
-        this.canvas.style.pointerEvents = 'none';
-        heroSection.appendChild(this.canvas);
-
-        // 캔버스 크기 설정
-        this.resizeCanvas();
-        window.addEventListener('resize', () => this.resizeCanvas());
-
-        // 파티클 생성
-        this.createParticles();
-
-        // 애니메이션 시작
-        this.animate();
+    // 새로운 글리치 라인 생성
+    createGlitchLine() {
+        const y = Math.random() * canvas.height;
+        const width = Math.random() * canvas.width + canvas.width / 2; // 더 긴 라인
+        const height = Math.random() * 15 + 5; // 높이 증가
+        const offset = Math.random() * 30 - 15; // 오프셋 증가
+        
+        return {
+            y,
+            width,
+            height,
+            offset,
+            alpha: Math.random() * 0.7 + 0.3, // 투명도 범위 조정
+            lifespan: Math.random() * 300 + 100, // 지속 시간 감소로 더 동적인 효과
+            rgbOffset: Math.random() * 10 + 5 // RGB 분할 효과 강화
+        };
     }
 
-    resizeCanvas() {
-        const heroSection = document.querySelector('.hero');
-        this.canvas.width = heroSection.offsetWidth;
-        this.canvas.height = heroSection.offsetHeight;
-    }
-
-    createParticles() {
-        // 하얀색 파티클 생성 (RGB: 255, 255, 255)
-        for (let i = 0; i < this.numberOfParticles; i++) {
-            this.particles.push(new Particle(this.canvas, this.ctx, '255, 255, 255'));
-        }
-    }
-
-    animate() {
-        // 캔버스 클리어
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // 각 파티클 업데이트 및 그리기
-        this.particles.forEach(particle => {
-            particle.update();
-            particle.draw();
-        });
-
-        // 파티클 연결선 그리기
-        this.connectParticles();
-
-        // 다음 프레임 요청
-        requestAnimationFrame(() => this.animate());
-    }
-
-    connectParticles() {
-        for (let i = 0; i < this.particles.length; i++) {
-            for (let j = i + 1; j < this.particles.length; j++) {
-                const dx = this.particles[i].x - this.particles[j].x;
-                const dy = this.particles[i].y - this.particles[j].y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                // 일정 거리 이내의 파티클끼리만 선으로 연결
-                if (distance < 100) {
-                    this.ctx.beginPath();
-                    this.ctx.strokeStyle = `rgba(255, 255, 255, ${0.2 * (1 - distance / 100)})`;
-                    this.ctx.lineWidth = 1;
-                    this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
-                    this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
-                    this.ctx.stroke();
-                }
+    // 글리치 효과 업데이트
+    update(timestamp) {
+        if (timestamp - this.lastUpdate > this.updateInterval) {
+            // 새로운 글리치 라인 추가
+            if (Math.random() < 0.4 && this.glitchLines.length < this.maxLines) { // 생성 확률 증가
+                this.glitchLines.push(this.createGlitchLine());
             }
+
+            // 기존 라인 업데이트 및 제거
+            this.glitchLines = this.glitchLines.filter(line => {
+                line.lifespan -= this.updateInterval;
+                line.offset += (Math.random() - 0.5) * 4; // 움직이는 효과 추가
+                return line.lifespan > 0;
+            });
+
+            this.lastUpdate = timestamp;
         }
+    }
+
+    // 글리치 효과 그리기
+    draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        this.glitchLines.forEach(line => {
+            // 메인 글리치 라인
+            ctx.fillStyle = `rgba(255, 255, 255, ${line.alpha})`;
+            ctx.fillRect(line.offset, line.y, line.width, line.height);
+            
+            // RGB 분할 효과 강화
+            // 빨간색 채널
+            ctx.fillStyle = `rgba(255, 0, 0, ${line.alpha * 0.8})`;
+            ctx.fillRect(line.offset + line.rgbOffset, line.y, line.width, line.height);
+            
+            // 녹색 채널
+            ctx.fillStyle = `rgba(0, 255, 0, ${line.alpha * 0.8})`;
+            ctx.fillRect(line.offset - line.rgbOffset, line.y, line.width, line.height);
+            
+            // 파란색 채널
+            ctx.fillStyle = `rgba(0, 0, 255, ${line.alpha * 0.8})`;
+            ctx.fillRect(line.offset, line.y + line.rgbOffset/2, line.width, line.height);
+
+            // 추가 노이즈 효과
+            if (Math.random() < 0.3) {
+                const noiseWidth = Math.random() * 50 + 20;
+                const noiseHeight = Math.random() * 2 + 1;
+                ctx.fillStyle = `rgba(255, 255, 255, ${line.alpha * 0.5})`;
+                ctx.fillRect(
+                    Math.random() * canvas.width,
+                    line.y + Math.random() * 10 - 5,
+                    noiseWidth,
+                    noiseHeight
+                );
+            }
+        });
     }
 }
 
-// DOM이 로드되면 애니메이션 초기화
-document.addEventListener('DOMContentLoaded', () => {
-    new ParticleAnimation();
-});
+// 글리치 효과 초기화 및 애니메이션 시작
+const glitchEffect = new GlitchEffect();
+
+function animate(timestamp) {
+    glitchEffect.update(timestamp);
+    glitchEffect.draw();
+    requestAnimationFrame(animate);
+}
+
+// 애니메이션 시작
+animate();
 
 // about me section 마우스 변경 효과
-
 class HeartCursor {
     constructor() {
         this.cursor = null;
@@ -505,6 +494,46 @@ function updateHeroText() {
         heroTitle.setAttribute('data-text', 'UX/UI 디자이너 도문영입니다');
     }
 }
+
+// Add this to your JavaScript file
+document.addEventListener('DOMContentLoaded', function() {
+    const heroBtn = document.querySelector('.hero-btn');
+    let x = Math.random() * (window.innerWidth - 100); // 100 is button width
+    let y = Math.random() * (window.innerHeight - 100); // 100 is button height
+    let dx = 2; // X velocity
+    let dy = 2; // Y velocity
+
+    function animate() {
+        // Get button dimensions
+        const rect = heroBtn.getBoundingClientRect();
+        
+        // Update position
+        x += dx;
+        y += dy;
+        
+        // Bounce off walls
+        if (x <= 0 || x + rect.width >= window.innerWidth) {
+            dx = -dx;
+        }
+        if (y <= 0 || y + rect.height >= window.innerHeight) {
+            dy = -dy;
+        }
+        
+        // Apply new position
+        heroBtn.style.left = x + 'px';
+        heroBtn.style.top = y + 'px';
+        
+        requestAnimationFrame(animate);
+    }
+
+    // Initialize button position
+    heroBtn.style.position = 'fixed';
+    heroBtn.style.left = x + 'px';
+    heroBtn.style.top = y + 'px';
+    
+    // Start animation
+    animate();
+});
 
 // 페이지 로드 시 실행
 window.addEventListener('load', updateHeroText);
